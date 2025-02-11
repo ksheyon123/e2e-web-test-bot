@@ -1,26 +1,35 @@
-const { ChatAnthropic } = require("langchain/chat_models/anthropic");
-const { PromptTemplate } = require("langchain/prompts");
-const { LLMChain } = require("langchain/chains");
+const { ChatAnthropic } = require("@langchain/anthropic");
+const { HumanMessage, SystemMessage } = require("@langchain/core/messages");
 
-// Claude 모델 초기화
-const chat = new ChatAnthropic({
-  anthropicApiKey: process.env.ANTHROPIC_API_KEY,
-  modelName: "claude-3-opus-20240229",
-  temperature: 0.7,
-});
+const createModel = () => {
+  // Claude 모델 초기화
+  const model = new ChatAnthropic({
+    anthropicApiKey: process.env.ANTHROPIC_API_KEY,
+    model: "claude-3-5-sonnet-20240620",
+    temperature: 0,
+  });
+  return model;
+};
 
-// 프롬프트 템플릿 생성
-const promptTemplate = new PromptTemplate({
-  template: "다음 주제에 대해 설명해주세요: {topic}",
-  inputVariables: ["topic"],
-});
-
-// LLMChain 생성
-const chain = new LLMChain({
-  llm: chat,
-  prompt: promptTemplate,
-});
+const createMessage = (base64_image) => {
+  messages = [
+    HumanMessage(
+      (content = [
+        {
+          type: "image",
+          image_url: `data:image/jpeg;base64,${base64_image}`,
+        },
+        {
+          type: "text",
+          text: "이 이미지를 분석해주세요.",
+        },
+      ])
+    ),
+  ];
+  return message;
+};
 
 module.exports = {
-  chain,
+  createModel,
+  createMessage,
 };

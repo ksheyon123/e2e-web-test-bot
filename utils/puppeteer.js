@@ -1,29 +1,20 @@
 // Puppeteer 자동화 함수
-const screenshotsDir = "./public/screenshots";
+const goToPage = async (page, url = "http://localhost:3000") => {
+  console.log("로그인 페이지로 이동 시도...");
+  await page.goto(url, {
+    waitUntil: "networkidle0",
+    timeout: 30000,
+  });
+};
+
 async function runAutomation(browser) {
   // 테스트용 로그인 정보
   const email = "test@example.com";
   const password = "testpassword123";
   console.log(browser);
   try {
-    const page = await browser.newPage();
-    page.setDefaultNavigationTimeout(30000);
-    page.setDefaultTimeout(30000);
-
-    // React 로그인 페이지로 이동
-    console.log("로그인 페이지로 이동 시도...");
-    await page.goto("http://localhost:3000", {
-      waitUntil: "networkidle0",
-      timeout: 30000,
-    });
-
-    // 로그인 시도 전 스크린샷
-    await page.screenshot({
-      path: `${screenshotsDir}/before-login.png`,
-    });
-
     console.log("마우스 이동...");
-    mouseMove(page, { x: 400, y: 230 });
+    mouseMove(page, { x: 400, y: 230, delay: 100 });
     console.log("마우스 클릭...");
     mouseClick(page, { x: 400, y: 230 });
 
@@ -56,6 +47,17 @@ async function runAutomation(browser) {
     throw error;
   }
 }
+
+const getScreenshot = async (page, hash) => {
+  try {
+    // 로그인 시도 전 스크린샷
+    await page.screenshot({
+      path: `./public/screenshots/${hash}/default_screen.png`,
+    });
+  } catch (e) {
+    throw e;
+  }
+};
 
 const mouseMove = async (page, coord) => {
   const { x, y } = coord;
@@ -91,7 +93,7 @@ const mouseMove = async (page, coord) => {
     y
   );
 
-  await page.mouse.move(x, y, { steps: 50, delay: 100 });
+  await page.mouse.move(x, y, { steps: 50, delay: 300 });
 };
 
 const mouseClick = async (page, coord) => {
@@ -101,5 +103,7 @@ const mouseClick = async (page, coord) => {
 
 module.exports = {
   runAutomation,
+  goToPage,
   mouseMove,
+  getScreenshot,
 };

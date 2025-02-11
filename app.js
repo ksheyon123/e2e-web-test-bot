@@ -1,13 +1,15 @@
 // app.js
 const express = require("express");
 const morgan = require("morgan");
-const fs = require("fs");
 require("dotenv").config();
 
+const { createScreenShotsDir } = require("./utils/fs");
 const router = require("./router/endpoint");
 
 const app = express();
 const port = 8080;
+
+createScreenShotsDir();
 
 // 미들웨어 설정
 app.use(express.json());
@@ -18,12 +20,6 @@ app.use(morgan("dev"));
 app.use(express.static("public"));
 
 app.use("/automate", router);
-
-// 스크린샷 디렉토리 생성
-const screenshotsDir = "./public/screenshots";
-if (!fs.existsSync(screenshotsDir)) {
-  fs.mkdirSync(screenshotsDir, { recursive: true });
-}
 
 // 서버 시작
 app.listen(port, () => {
