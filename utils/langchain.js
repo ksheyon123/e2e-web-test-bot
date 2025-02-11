@@ -5,6 +5,7 @@ const { ChatPromptTemplate } = require("@langchain/core/prompts");
 const createModel = () => {
   console.log("Claude 모델 생성...");
   return new ChatAnthropic({
+    cache: false,
     anthropicApiKey: process.env.ANTHROPIC_API_KEY,
     modelName: "claude-3-5-sonnet-20240620",
     temperature: 0,
@@ -14,75 +15,90 @@ const createModel = () => {
 const createMessage = async (base64Image) => {
   console.log("Claude 요청 메세지 생성...");
 
-  const systemPrompt = `
-  
-  당신은 웹 UI 테스트 자동화 전문가입니다. 1920x1080 해상도의 웹 페이지 스크린샷을 분석하여 다음 작업을 수행하세요:
+  const systemPrompt = `당신은 웹 UI 테스트 자동화 전문가입니다. 1920x1080 해상도의 웹 페이지 스크린샷을 분석하여 다음 작업을 수행하세요:
 
-  1. 기준점 정보:
-    - criterion이라는 텍스트가 작성되어 있습니다.
-    - 스크린샷 내 40x40 픽셀 크기의 기준 DOM 객체가 존재합니다
-    - 이 기준 객체를 참조하여 다른 모든 UI 요소들의 상대적 위치를 추정하세요
-    - 기준 객체의 픽셀 크기(40x40)를 스케일로 활용하여 다른 요소들의 위치를 측정하세요
-    - 스크린샷의 요소들의 위치를 추정할 때, 기준점은 배제합니다.
+1. 뷰포트 정보:
+  - 너비: 1920px (48px * 40 섹션)
+  - 높이: 1080px (27px * 40 섹션)
+  - 스케일: 1
+  - 좌표계: 좌상단이 (0,0)
 
-  2. 페이지에서 발견된 모든 상호작용 가능한 UI 요소를 식별하고 분류합니다:
-    - 입력 필드 (텍스트, 이메일, 비밀번호 등)
-    - 버튼
-    - 드롭다운 메뉴
-    - 체크박스
-    - 라디오 버튼
-    - 링크
-    - 기타 클릭 가능한 요소
+2. 그리드 기반 레이아웃 분석:
+  2-1. 기본 그리드 구조:
+    - 40x40 그리드 (가로 48px, 세로 27px 단위)
+    - 가로 섹션: 각 48px (1920/40)
+    - 세로 섹션: 각 27px (1080/40)
+    - 섹션 번호는 0부터 시작 (예: 섹션[0,0]은 좌상단 첫 번째 섹션)
+    - 가로 세로 섹션은 각각 40개 (섹션번호 : [0, 0] ~ [40, 40])
 
-  3. 뷰포트 정보:
-    - 너비: 1920px
-    - 높이: 1080px
-    - 좌표계: 좌상단이 (0,0)
+  2-2. 그리드 좌표 매핑:
+    - 각 UI 컴포넌트의 그리드 좌표 (예: [20,15]는 가로 20번째, 세로 15번째 섹션)
+    - 컴포넌트가 차지하는 그리드 섹션 범위
+    - 그리드 내 정렬 (시작, 중앙, 끝)
 
-  4. 좌표 측정 방법:
-    - 기준 DOM 객체(40x40)의 크기를 기준으로 위치 계산
-    - 모든 좌표는 기준 객체의 크기를 바탕으로 절대 픽셀값으로 표시
+  2-3. 컴포넌트 상세 정보:
+    - 컴포넌트 유형
+    - 시작 그리드 좌표 [x,y]
+    - 차지하는 그리드 섹션 수 [width,height]
+    - 픽셀 좌표 (그리드 좌표 * 단위크기)
+    - 섹션 내 상대적 위치 (오프셋)
 
-  5. 결과는 다음 JSON 형식으로 구조화하여 제공하세요:
+  2-4. 레이아웃 패턴 분석:
+    - 수평/수직 정렬 패턴
+    - 컴포넌트 간 그리드 간격
+    - 그리드 섹션 활용 패턴
 
-    {{
-      "viewport": {{
-        "width": 1920,
-        "height": 1080
-      }},
-      "referenceElement": {{
-        "size": {{
-          "width": 40,
-          "height": 40
-        }},
-        "position": {{
+3. UI 컴포넌트 분류:
+  3-1. 입력 요소 (Input, Textarea 등):
+    - 텍스트 입력: 그리드 위치 및 크기
+    - 비밀번호 입력: 그리드 위치 및 크기
+  3-2. 컨트롤 요소 (Button, Link 등):
+    - 버튼: 그리드 위치 및 크기
+    - 링크: 그리드 위치 및 크기
+
+4. JSON 결과:
+  {{
+    "viewport": {{
+      "width": 1920,
+      "height": 1080,
+      "gridSize": 40,
+      "unitWidth": 48,
+      "unitHeight": 27
+    }},
+    "elements": [
+      {{
+        "type": "요소 유형",
+        "gridPosition": {{
           "x": 0,
           "y": 0
-        }}
-      }},
-      "elements": [
-        {{
-          "type": "요소 유형",
-          "coord": {{
-            "x": 0,
-            "y": 0
-          }},
-          "purpose": "예상 목적",
-          "testScenarios": ["테스트 시나리오 1", "테스트 시나리오 2"]
-        }}
-      ]
+        }},
+        "gridSpan": {{
+          "width": 0,
+          "height": 0
+        }},
+        "pixelCoord": {{
+          "x": 0,
+          "y": 0
+        }},
+        "size": {{
+          "width": 0,
+          "height": 0
+        }},
+        "purpose": "예상 목적",
+        "testScenarios": ["테스트 시나리오 1", "테스트 시나리오 2"]
+      }}
+    ],
+    "layoutPattern": {{
+      "alignment": "정렬 패턴",
+      "spacing": "컴포넌트 간 그리드 간격",
+      "distribution": "그리드 섹션 활용 방식"
     }}
+  }}
 
-  6. 좌표 추정 시 다음을 고려하세요:
-    - 기준 DOM 객체(40x40)와의 상대적 거리
-    - 일반적인 웹 디자인 패턴
-    - 요소들 간의 상대적 위치
-    - 여백과 정렬
-    - 컴포넌트의 표준 크기
+  1. 문자열이 아닌 JSON 객체로 직접 응답하세요.
+  2. 이스케이프된 문자나 줄바꿈 문자를 포함하지 마세요.`;
 
-  JSON 형식으로만 응답하세요.`;
-
-  const humanPrompt = `다음 1920x1080 해상도의 웹 페이지 스크린샷을 분석하여 40x40 기준 DOM 객체를 참조한 UI 요소들의 위치와 목록을 제공해주세요: {base64_image}`;
+  const humanPrompt = `다음 1920x1080 해상도의 웹 페이지 스크린샷을 분석하여 UI 컴포넌트들의 위치와 목록을 제공해주세요: {base64_image}`;
 
   const chatPrompt = ChatPromptTemplate.fromMessages([
     ["system", systemPrompt],

@@ -8,6 +8,7 @@ const {
   goToPage,
   getScreenshot,
   mouseMove,
+  createGridOverlay,
 } = require("../utils/puppeteer");
 const { createHash } = require("../utils/index");
 const { setScreenshots, getScreenshots } = require("../utils/fs");
@@ -35,6 +36,7 @@ router.get("/launch", async (req, res) => {
     page.setDefaultNavigationTimeout(30000);
     page.setDefaultTimeout(30000);
     await goToPage(page, url);
+    await createGridOverlay(page);
     res.json({ success: true });
   } catch (e) {
     console.error("자동화 에러:", e);
@@ -46,7 +48,6 @@ router.get("/screenshot", async (req, res) => {
   try {
     hash = createHash();
     await setScreenshots(hash);
-    await setCriterion(page);
     console.log("초기 화면 스크린샷...");
     await getScreenshot(page, hash);
     res.json({ success: true });
@@ -74,10 +75,12 @@ router.get("/features", async (req, res) => {
 
 router.get("/test", async (req, res) => {
   try {
+    const { idx } = req.query;
     const { elements } = actions;
-    const coord = elements[0].coord;
+    const coord = elements[Number(idx)].pixelCoord;
+    const size = elements[Number(idx)].size;
     console.log(coord);
-    await mouseMove(page, coord);
+    await mouseMove(page, coord, size);
 
     res.json({ success: true });
   } catch (e) {
