@@ -9,6 +9,11 @@ const {
 } = require("../utils/puppeteer");
 const { createHash } = require("../utils/index");
 const { setScreenshots, getScreenshots } = require("../utils/fs");
+const {
+  createModel,
+  createMessage,
+  requestMessage,
+} = require("../utils/langchain");
 
 let page = null;
 let hash = null;
@@ -46,7 +51,11 @@ router.get("/features", async (req, res) => {
     const imageBuffer = await getScreenshots(hash, "default_screen.png");
     // 2. buffer를 base64로 변환
     const base64Image = imageBuffer.toString("base64");
-    res.json({ success: true });
+    const chain = createModel();
+    const message = await createMessage(base64Image);
+    console.log(message);
+    const response = await requestMessage(chain, message);
+    res.json({ success: true, data: response });
   } catch (e) {
     res.status(500).json({ success: false, error: e.message });
   }
