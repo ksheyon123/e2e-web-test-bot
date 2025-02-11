@@ -59,6 +59,34 @@ const getScreenshot = async (page, hash) => {
   }
 };
 
+const setCriterion = async (page) => {
+  await page.evaluate(() => {
+    // 기존 커서가 있다면 제거
+    const existingCursor = document.getElementById("custom-criterion");
+    if (existingCursor) {
+      existingCursor.remove();
+    }
+
+    const criterion = document.createElement("div");
+    criterion.id = "custom-criterion";
+    criterion.innerHTML = "criterion";
+    criterion.style.cssText = `
+        width: 40px;
+        height: 40px;
+        position: fixed;
+        pointer-events: none;
+        font-size: 8px;
+        position: fixed;
+        pointer-events: none;
+        top : 0px;
+        left : 0px;
+        z-index: 9999;
+        background: rgba(255, 0, 0, 0.6);
+      `;
+    document.body.appendChild(criterion);
+  });
+};
+
 const mouseMove = async (page, coord) => {
   const { x, y } = coord;
 
@@ -102,6 +130,7 @@ const mouseClick = async (page, coord) => {
 };
 
 module.exports = {
+  setCriterion,
   runAutomation,
   goToPage,
   mouseMove,

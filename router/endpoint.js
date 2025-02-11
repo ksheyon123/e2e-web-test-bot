@@ -4,8 +4,10 @@ const router = express.Router();
 
 const {
   runAutomation,
+  setCriterion,
   goToPage,
   getScreenshot,
+  mouseMove,
 } = require("../utils/puppeteer");
 const { createHash } = require("../utils/index");
 const { setScreenshots, getScreenshots } = require("../utils/fs");
@@ -22,7 +24,13 @@ let hash = null;
 router.get("/launch", async (req, res) => {
   try {
     const { url } = req.query;
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({
+      headless: false,
+      defaultViewport: {
+        width: 1920,
+        height: 1080,
+      },
+    });
     page = await browser.newPage();
     page.setDefaultNavigationTimeout(30000);
     page.setDefaultTimeout(30000);
@@ -38,6 +46,7 @@ router.get("/screenshot", async (req, res) => {
   try {
     hash = createHash();
     await setScreenshots(hash);
+    await setCriterion(page);
     console.log("초기 화면 스크린샷...");
     await getScreenshot(page, hash);
     res.json({ success: true });
@@ -46,6 +55,8 @@ router.get("/screenshot", async (req, res) => {
   }
 });
 
+let actions = null;
+
 router.get("/features", async (req, res) => {
   try {
     const imageBuffer = await getScreenshots(hash, "default_screen.png");
@@ -53,11 +64,24 @@ router.get("/features", async (req, res) => {
     const base64Image = imageBuffer.toString("base64");
     const chain = createModel();
     const message = await createMessage(base64Image);
-    console.log(message);
     const response = await requestMessage(chain, message);
+    actions = { ...response };
     res.json({ success: true, data: response });
   } catch (e) {
     res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+router.get("/test", async (req, res) => {
+  try {
+    const { elements } = actions;
+    const coord = elements[0].coord;
+    console.log(coord);
+    await mouseMove(page, coord);
+
+    res.json({ success: true });
+  } catch (e) {
+    throw e;
   }
 });
 
