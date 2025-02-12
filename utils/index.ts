@@ -1,6 +1,6 @@
-const crypto = require("crypto");
+import crypto from "crypto";
 
-const createHash = () => {
+const createHash = (): string => {
   // Or using SHA-256 with a random string
   const randomHash = crypto
     .createHash("sha256")
@@ -9,6 +9,4 @@ const createHash = () => {
   return randomHash;
 };
 
-module.exports = {
-  createHash,
-};
+export { createHash };

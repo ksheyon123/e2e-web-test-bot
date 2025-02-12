@@ -1,14 +1,14 @@
-// app.js
-const express = require("express");
-const morgan = require("morgan");
-require("dotenv").config();
+import express, { Express, Request, Response, NextFunction } from "express";
+import morgan from "morgan";
+import dotenv from "dotenv";
+import { createScreenShotsDir } from "./utils/fs";
+import router from "./router/endpoint";
+import api from "./router/api";
 
-const { createScreenShotsDir } = require("./utils/fs");
-const router = require("./router/endpoint");
-const api = require("./router/api");
+dotenv.config();
 
-const app = express();
-const port = 8080;
+const app: Express = express();
+const port: number = 8080;
 
 createScreenShotsDir();
 
@@ -23,7 +23,7 @@ app.use(express.static("public"));
 app.use("/automate", router);
 app.use("/api", api);
 
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
   res.set("Cache-Control", "no-store");
   // 또는 더 완벽한 캐시 비활성화를 위해:
   res.set({

@@ -1,4 +1,4 @@
-const systemPrompt = `당신은 웹 UI 테스트 자동화 전문가입니다. 1920x1080 해상도의 웹 페이지 스크린샷을 분석하여 다음 작업을 수행하세요:
+export const systemPrompt: string = `당신은 웹 UI 테스트 자동화 전문가입니다. 1920x1080 해상도의 웹 페이지 스크린샷을 분석하여 다음 작업을 수행하세요:
 
 1. 분석 범위
   - 현재 화면에서 시각적으로 보이는 UI 요소만 분석
@@ -74,9 +74,9 @@ const systemPrompt = `당신은 웹 UI 테스트 자동화 전문가입니다. 1
   1. 응답값에 JSON 만!!!!
   `;
 
-const humanPrompt = `다음 1920x1080 해상도의 웹 페이지 스크린샷을 분석하여 UI 컴포넌트들의 위치와 목록을 제공해주세요: {base64_image}`;
+export const humanPrompt: string = `다음 1920x1080 해상도의 웹 페이지 스크린샷을 분석하여 UI 컴포넌트들의 위치와 목록을 제공해주세요: {base64_image}`;
 
-const systemPrompt_new = `당신은 웹 UI 전문가입니다. 1920x1080 해상도의 웹 페이지 스크린샷을 분석하여 다음 작업을 수행하세요:
+export const systemPrompt_new: string = `당신은 웹 UI 전문가입니다. 1920x1080 해상도의 웹 페이지 스크린샷을 분석하여 다음 작업을 수행하세요:
 
 1. 화면 컨텍스트 파악
     - 스크린샷이 보여주는 페이지의 명확한 맥락 확인
@@ -121,17 +121,9 @@ const systemPrompt_new = `당신은 웹 UI 전문가입니다. 1920x1080 해상�
   - 화면에 명시적으로 보이지 않는 요소나 기능은 제외
 `;
 
-const humanPrompt_new = `다음 1920x1080 해상도의 웹 페이지 스크린샷을 분석하여 UI 컴포넌트들의 목록을 제공해주세요:`;
+export const humanPrompt_new: string = `다음 1920x1080 해상도의 웹 페이지 스크린샷을 분석하여 UI 컴포넌트들의 목록을 제공해주세요:`;
 
-const formatInstruction = `{{ 
+export const formatInstruction: string = `{{ 
   "viewport":{{ "width": "number", "height": "number", "gridSize": "number", "unitWidth": "number", "unitHeight": "number"}},
   "elements": [{{ "type": "string", "purpose": "string", "text": "string" }}],
 }}`;
-
-module.exports = {
-  systemPrompt,
-  humanPrompt,
-  systemPrompt_new,
-  humanPrompt_new,
-  formatInstruction,
-};

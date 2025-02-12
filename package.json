@@ -2,10 +2,13 @@
   "name": "express-puppeteer-automation",
   "version": "1.0.0",
   "description": "Express server with Puppeteer automation",
-  "main": "app.js",
+  "main": "dist/app.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js"
+    "build": "tsc",
+    "start": "node dist/app.js",
+    "dev": "nodemon --watch \"**/*.ts\" --exec \"ts-node\" app.ts",
+    "clean": "rm -rf dist",
+    "prebuild": "npm run clean"
   },
   "dependencies": {
     "@langchain/anthropic": "^0.3.13",
@@ -20,6 +23,12 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "nodemon": "^3.0.0"
+    "@types/express": "^5.0.0",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^22.13.1",
+    "@types/puppeteer": "^7.0.4",
+    "nodemon": "^3.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
   }
 }

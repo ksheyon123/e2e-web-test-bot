@@ -1,15 +1,21 @@
-const { ChatAnthropic } = require("@langchain/anthropic");
-const { JsonOutputParser } = require("@langchain/core/output_parsers");
-const { ChatPromptTemplate } = require("@langchain/core/prompts");
-const {
+import { ChatAnthropic } from "@langchain/anthropic";
+import { JsonOutputParser } from "@langchain/core/output_parsers";
+import { ChatPromptTemplate } from "@langchain/core/prompts";
+import {
   systemPrompt_new,
   humanPrompt_new,
   formatInstruction,
-} = require("../prompt/prompt");
+} from "../prompt/prompt";
+import { RunnableSequence } from "@langchain/core/runnables";
 
 const parser = new JsonOutputParser();
 
-const createModel = () => {
+interface ChainInput {
+  query: string;
+  base64: string;
+}
+
+const createModel = (): ChatAnthropic => {
   console.log("Claude 모델 생성...");
   return new ChatAnthropic({
     anthropicApiKey: process.env.ANTHROPIC_API_KEY,
@@ -18,7 +24,7 @@ const createModel = () => {
   });
 };
 
-const createPrompt = async () => {
+const createPrompt = async (): Promise<ChatPromptTemplate> => {
   console.log("Claude 요청 메세지 생성...");
 
   // https://js.langchain.com/docs/how_to/multimodal_prompts/
@@ -38,7 +44,12 @@ const createPrompt = async () => {
   return chatPrompt;
 };
 
-const requestAnswer = async (prompt, model, query, base64) => {
+const requestAnswer = async (
+  prompt: ChatPromptTemplate,
+  model: ChatAnthropic,
+  query: string,
+  base64: string
+): Promise<any> => {
   try {
     console.log("요청 전송 중...");
     try {
@@ -50,7 +61,7 @@ const requestAnswer = async (prompt, model, query, base64) => {
       return response;
     } catch (parseError) {
       console.warn("JSON 파싱 실패:", parseError);
-      return response.content;
+      throw parseError;
     }
   } catch (error) {
     console.error("Request error:", error);
@@ -58,8 +69,4 @@ const requestAnswer = async (prompt, model, query, base64) => {
   }
 };
 
-module.exports = {
-  createModel,
-  createPrompt,
-  requestAnswer,
-};
+export { createModel, createPrompt, requestAnswer };
