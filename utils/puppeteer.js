@@ -140,15 +140,13 @@ async function createGridOverlay(page) {
       svg.appendChild(line);
 
       // 5의 배수 위치에 x좌표 라벨 추가
-      if (i % 5 === 0) {
-        const text = document.createElementNS(svgNS, "text");
-        text.setAttribute("x", x + 2);
-        text.setAttribute("y", 15);
-        text.setAttribute("fill", config.labelColor);
-        text.setAttribute("font-size", "12");
-        text.textContent = x.toString();
-        svg.appendChild(text);
-      }
+      const text = document.createElementNS(svgNS, "text");
+      text.setAttribute("x", x + 2);
+      text.setAttribute("y", 15);
+      text.setAttribute("fill", config.labelColor);
+      text.setAttribute("font-size", "12");
+      text.textContent = x.toString();
+      svg.appendChild(text);
     }
 
     // 가로선 그리기
@@ -164,15 +162,13 @@ async function createGridOverlay(page) {
       svg.appendChild(line);
 
       // 5의 배수 위치에 y좌표 라벨 추가
-      if (i % 5 === 0) {
-        const text = document.createElementNS(svgNS, "text");
-        text.setAttribute("x", 5);
-        text.setAttribute("y", y + 15);
-        text.setAttribute("fill", config.labelColor);
-        text.setAttribute("font-size", "12");
-        text.textContent = y.toString();
-        svg.appendChild(text);
-      }
+      const text = document.createElementNS(svgNS, "text");
+      text.setAttribute("x", 5);
+      text.setAttribute("y", y + 15);
+      text.setAttribute("fill", config.labelColor);
+      text.setAttribute("font-size", "12");
+      text.textContent = y.toString();
+      svg.appendChild(text);
     }
 
     // 그리드 토글을 위한 컨트롤 버튼 추가
