@@ -116,34 +116,22 @@ const systemPrompt_new = `당신은 웹 UI 전문가입니다. 1920x1080 해상�
    - 입력 필드(Input Field)
    - 링크(Link)
 
-6. 결과: 
-  {{
-    "viewport": {{
-      "width": 1920,
-      "height": 1080,
-      "gridSize": 40,
-      "unitWidth": 48,
-      "unitHeight": 27
-    }},
-    "elements": [
-      {{
-        "type": "요소의 유형(버튼, 입력필드 등)",
-        "purpose": "요소의 예상 목적/기능",
-        "text": "요소에 포함된 텍스트(있는 경우)"
-      }}
-    ],
-  }}
-
   - 응답값에는 JSON만 포함(응답에 설명 제거)
   - 분석 설명이나 부가 설명 없이 JSON 데이터만 반환
   - 화면에 명시적으로 보이지 않는 요소나 기능은 제외
 `;
 
-const humanPrompt_new = `다음 1920x1080 해상도의 웹 페이지 스크린샷을 분석하여 UI 컴포넌트들의 목록을 제공해주세요: {base64_image}`;
+const humanPrompt_new = `다음 1920x1080 해상도의 웹 페이지 스크린샷을 분석하여 UI 컴포넌트들의 목록을 제공해주세요:`;
+
+const formatInstruction = `{{ 
+  "viewport":{{ "width": "number", "height": "number", "gridSize": "number", "unitWidth": "number", "unitHeight": "number"}},
+  "elements": [{{ "type": "string", "purpose": "string", "text": "string" }}],
+}}`;
 
 module.exports = {
   systemPrompt,
   humanPrompt,
   systemPrompt_new,
   humanPrompt_new,
+  formatInstruction,
 };

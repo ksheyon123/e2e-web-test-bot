@@ -15,7 +15,7 @@ const { createHash } = require("../utils/index");
 const { setScreenshots, getScreenshots } = require("../utils/fs");
 const {
   createModel,
-  createMessage,
+  createPrompt,
   requestMessage,
 } = require("../utils/langchain");
 
@@ -65,8 +65,8 @@ router.get("/features", async (req, res) => {
     // 2. buffer를 base64로 변환
     const base64Image = imageBuffer.toString("base64");
     const chain = createModel();
-    const message = await createMessage(base64Image);
-    const response = await requestMessage(chain, message);
+    const prompt = await createPrompt();
+    const response = await requestMessage(prompt, chain, base64Image);
     actions = { ...response };
     res.json({ success: true, data: response });
   } catch (e) {

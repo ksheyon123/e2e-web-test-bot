@@ -1,7 +1,13 @@
 const { ChatAnthropic } = require("@langchain/anthropic");
-const { MessagesPlaceholder } = require("@langchain/core/prompts");
+const { JsonOutputParser } = require("@langchain/core/output_parsers");
 const { ChatPromptTemplate } = require("@langchain/core/prompts");
-const { systemPrompt_new, humanPrompt_new } = require("../prompt/prompt");
+const {
+  systemPrompt_new,
+  humanPrompt_new,
+  formatInstruction,
+} = require("../prompt/prompt");
+
+const parser = new JsonOutputParser();
 
 const createModel = () => {
   console.log("Claude 모델 생성...");
@@ -12,31 +18,28 @@ const createModel = () => {
   });
 };
 
-const createMessage = async (base64Image) => {
+const createPrompt = async (base64Image) => {
   console.log("Claude 요청 메세지 생성...");
-
   const chatPrompt = ChatPromptTemplate.fromMessages([
-    ["system", systemPrompt_new],
-    ["human", humanPrompt_new],
-    new MessagesPlaceholder("chat_history"),
-  ]);
-
-  const formattedPrompt = await chatPrompt.formatMessages({
-    base64_image: base64Image ? `data:image/jpeg;base64,${base64Image}` : "",
-    chat_history: [],
+    ["system", `${systemPrompt_new}\n\n응답 형식:\n{format_instructions}`],
+    ["human", `{query}`],
+  ]).partial({
+    format_instructions: formatInstruction,
   });
 
-  return formattedPrompt;
+  return chatPrompt;
 };
 
-const requestMessage = async (model, messages) => {
+const requestMessage = async (prompt, model, base64Image) => {
   try {
     console.log("요청 전송 중...");
-    const response = await model.invoke(messages);
-
     try {
-      const parsedResponse = JSON.parse(response.content);
-      return parsedResponse;
+      const query = `${humanPrompt_new}${base64Image}`;
+      const chain = prompt.pipe(model).pipe(parser);
+      const response = await chain.invoke({
+        query,
+      });
+      return response;
     } catch (parseError) {
       console.warn("JSON 파싱 실패:", parseError);
       return response.content;
@@ -49,6 +52,6 @@ const requestMessage = async (model, messages) => {
 
 module.exports = {
   createModel,
-  createMessage,
+  createPrompt,
   requestMessage,
 };
