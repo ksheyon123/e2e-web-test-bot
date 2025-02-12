@@ -16,8 +16,9 @@ const { setScreenshots, getScreenshots } = require("../utils/fs");
 const {
   createModel,
   createPrompt,
-  requestMessage,
+  requestAnswer,
 } = require("../utils/langchain");
+const { humanPrompt_new } = require("../prompt/prompt");
 
 let page = null;
 let hash = null;
@@ -64,9 +65,10 @@ router.get("/features", async (req, res) => {
     const imageBuffer = await getScreenshots(hash, "default_screen.png");
     // 2. buffer를 base64로 변환
     const base64Image = imageBuffer.toString("base64");
+    const query = `${humanPrompt_new}`;
     const chain = createModel();
     const prompt = await createPrompt();
-    const response = await requestMessage(prompt, chain, base64Image);
+    const response = await requestAnswer(prompt, chain, query, base64Image);
     actions = { ...response };
     res.json({ success: true, data: response });
   } catch (e) {

@@ -18,11 +18,19 @@ const createModel = () => {
   });
 };
 
-const createPrompt = async (base64Image) => {
+const createPrompt = async () => {
   console.log("Claude 요청 메세지 생성...");
+
+  // https://js.langchain.com/docs/how_to/multimodal_prompts/
   const chatPrompt = ChatPromptTemplate.fromMessages([
     ["system", `${systemPrompt_new}\n\n응답 형식:\n{format_instructions}`],
-    ["human", `{query}`],
+    [
+      "user",
+      [
+        { type: "text", message: "{query}" },
+        { type: "image_url", image_url: "data:image/png;base64,{base64}" },
+      ],
+    ],
   ]).partial({
     format_instructions: formatInstruction,
   });
@@ -30,14 +38,14 @@ const createPrompt = async (base64Image) => {
   return chatPrompt;
 };
 
-const requestMessage = async (prompt, model, base64Image) => {
+const requestAnswer = async (prompt, model, query, base64) => {
   try {
     console.log("요청 전송 중...");
     try {
-      const query = `${humanPrompt_new}${base64Image}`;
       const chain = prompt.pipe(model).pipe(parser);
       const response = await chain.invoke({
         query,
+        base64,
       });
       return response;
     } catch (parseError) {
@@ -53,5 +61,5 @@ const requestMessage = async (prompt, model, base64Image) => {
 module.exports = {
   createModel,
   createPrompt,
-  requestMessage,
+  requestAnswer,
 };

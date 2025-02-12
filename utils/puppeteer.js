@@ -1,7 +1,7 @@
 // Puppeteer 자동화 함수
-const goToPage = async (page, url = "http://localhost:3000/signup") => {
+const goToPage = async (page, url = "http://localhost:3000/signin") => {
   console.log("로그인 페이지로 이동 시도...");
-  await page.goto("http://localhost:3000/signup", {
+  await page.goto("http://localhost:3000/signin", {
     waitUntil: "networkidle0",
     timeout: 30000,
   });
