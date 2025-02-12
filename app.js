@@ -5,6 +5,7 @@ require("dotenv").config();
 
 const { createScreenShotsDir } = require("./utils/fs");
 const router = require("./router/endpoint");
+const api = require("./router/api");
 
 const app = express();
 const port = 8080;
@@ -20,6 +21,19 @@ app.use(morgan("dev"));
 app.use(express.static("public"));
 
 app.use("/automate", router);
+app.use("/api", api);
+
+app.use((req, res, next) => {
+  res.set("Cache-Control", "no-store");
+  // 또는 더 완벽한 캐시 비활성화를 위해:
+  res.set({
+    "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+    Pragma: "no-cache",
+    Expires: "0",
+    "Surrogate-Control": "no-store",
+  });
+  next();
+});
 
 // 서버 시작
 app.listen(port, () => {

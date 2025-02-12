@@ -1,7 +1,7 @@
 // Puppeteer 자동화 함수
 const goToPage = async (page, url = "http://localhost:3000/signin") => {
   console.log("로그인 페이지로 이동 시도...");
-  await page.goto(url, {
+  await page.goto("http://localhost:3000/signin", {
     waitUntil: "networkidle0",
     timeout: 30000,
   });
@@ -64,7 +64,7 @@ const mouseMove = async (page, coord, size) => {
   const { width, height } = size;
 
   await page.evaluate(
-    (posX, posY) => {
+    (posX, posY, width, height) => {
       // 기존 커서가 있다면 제거
       const existingCursor = document.getElementById("custom-cursor");
       if (existingCursor) {
@@ -89,7 +89,9 @@ const mouseMove = async (page, coord, size) => {
       cursor.style.top = posY + height / 2 + "px";
     },
     x,
-    y
+    y,
+    width,
+    height
   );
 
   await page.mouse.move(x, y, { steps: 50, delay: 300 });
@@ -194,6 +196,7 @@ module.exports = {
   runAutomation,
   goToPage,
   mouseMove,
+  mouseClick,
   getScreenshot,
   createGridOverlay,
 };

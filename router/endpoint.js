@@ -8,6 +8,7 @@ const {
   goToPage,
   getScreenshot,
   mouseMove,
+  mouseClick,
   createGridOverlay,
 } = require("../utils/puppeteer");
 const { createHash } = require("../utils/index");
@@ -71,6 +72,14 @@ router.get("/features", async (req, res) => {
   } catch (e) {
     res.status(500).json({ success: false, error: e.message });
   }
+});
+
+router.get("/move", async (req, res) => {
+  await mouseMove(page, { x: 960, y: 621 }, { width: 10, height: 20 });
+});
+
+router.get("/click", async (req, res) => {
+  await mouseClick(page, { x: 960, y: 621 });
 });
 
 router.get("/test", async (req, res) => {
