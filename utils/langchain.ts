@@ -6,14 +6,13 @@ import {
   humanPrompt_new,
   formatInstruction,
 } from "../prompt/prompt";
-import { RunnableSequence } from "@langchain/core/runnables";
+import {
+  Runnable,
+  RunnableLambda,
+  RunnableSequence,
+} from "@langchain/core/runnables";
 
 const parser = new JsonOutputParser();
-
-interface ChainInput {
-  query: string;
-  base64: string;
-}
 
 const createModel = (): ChatAnthropic => {
   console.log("Claude 모델 생성...");
@@ -44,29 +43,54 @@ const createPrompt = async (): Promise<ChatPromptTemplate> => {
   return chatPrompt;
 };
 
-const requestAnswer = async (
-  prompt: ChatPromptTemplate,
-  model: ChatAnthropic,
+const requestAnswer = async <T>(
+  chain: Runnable,
   query: string,
   base64: string
-): Promise<any> => {
+): Promise<T> => {
   try {
     console.log("요청 전송 중...");
     try {
-      const chain = prompt.pipe(model).pipe(parser);
-      const response = await chain.invoke({
+      const response = (await chain.invoke({
         query,
         base64,
-      });
+      })) as T;
       return response;
     } catch (parseError) {
       console.warn("JSON 파싱 실패:", parseError);
       throw parseError;
     }
-  } catch (error) {
-    console.error("Request error:", error);
-    throw error;
+  } catch (e) {
+    console.error("Request error:", e);
+    throw e;
   }
 };
 
-export { createModel, createPrompt, requestAnswer };
+const createChain = async (
+  prompt: ChatPromptTemplate,
+  model: ChatAnthropic
+) => {
+  try {
+    const chain = prompt.pipe(model).pipe(parser);
+    return chain;
+  } catch (e) {
+    console.error("Request error:", e);
+    throw e;
+  }
+};
+
+const runnables = async (chain: Runnable) => {
+  try {
+    new RunnableLambda({
+      func: async (input: { topic: string }) => {
+        const result = await chain.invoke(input);
+        return { joke: result };
+      },
+    });
+  } catch (e) {
+    console.error("Request error:", e);
+    throw e;
+  }
+};
+
+export { createModel, createPrompt, createChain, requestAnswer };

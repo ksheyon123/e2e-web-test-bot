@@ -10,8 +10,14 @@ import {
 } from "../utils/puppeteer";
 import { createHash } from "../utils/index";
 import { setScreenshots, getScreenshots } from "../utils/fs";
-import { createModel, createPrompt, requestAnswer } from "../utils/langchain";
+import {
+  createModel,
+  createPrompt,
+  createChain,
+  requestAnswer,
+} from "../utils/langchain";
 import { humanPrompt_new } from "../prompt/prompt";
+import { AnswerElement } from "types/langchain.type";
 
 interface Coordinate {
   x: number;
@@ -89,9 +95,10 @@ router.get("/features", async (_req: Request, res: Response) => {
     // 2. buffer를 base64로 변환
     const base64Image = imageBuffer.toString("base64");
     const query = `${humanPrompt_new}`;
-    const chain = createModel();
+    const model = createModel();
     const prompt = await createPrompt();
-    const response = await requestAnswer(prompt, chain, query, base64Image);
+    const chain = await createChain(prompt, model);
+    const response = await requestAnswer<any>(chain, query, base64Image);
     actions = { ...response };
     res.json({ success: true, data: response });
   } catch (e) {
