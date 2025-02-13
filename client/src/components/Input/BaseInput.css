@@ -10,6 +10,7 @@
 
 .base-input:focus {
   border: none;
+  border-color: none;
   outline: none;
 }
 

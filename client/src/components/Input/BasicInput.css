@@ -22,8 +22,39 @@
   font-size: 14px;
 }
 
-.basic-input {
+.basic-input-field-container {
+  position: relative;
+  padding: 2px;
+  border-radius: 6px;
+  transition: all 0.2s ease-in-out;
+}
+
+.basic-input-container-focused .basic-input-field-container {
+  outline: 2px solid #3b82f6;
+  outline-offset: -2px;
+}
+
+.basic-input-container-error .basic-input-field-container {
+  outline: 2px solid #ef4444;
+  outline-offset: -2px;
+}
+
+.basic-input-error-message {
+  font-size: 12px;
+  color: #ef4444;
+  margin: 4px 0 0;
+}
+
+.basic-input-helper-text {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 4px 0 0;
+}
+
+/* BaseInput 스타일 재정의 */
+.basic-input-field-container input {
   width: 100%;
+  height: 100%;
   padding: 8px 12px;
   font-size: 14px;
   line-height: 1.5;
@@ -31,37 +62,17 @@
   border-radius: 4px;
   background-color: #ffffff;
   transition: all 0.2s ease-in-out;
+  box-sizing: border-box;
 }
 
-.basic-input:focus {
+.basic-input-field-container input:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+  border-color: #d1d5db;
 }
 
-.basic-input-error {
-  border-color: #ef4444;
-}
-
-.basic-input-error:focus {
-  border-color: #ef4444;
-  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.1);
-}
-
-.basic-input:disabled {
+.basic-input-field-container input:disabled {
   background-color: #f3f4f6;
   cursor: not-allowed;
   color: #6b7280;
-}
-
-.basic-input-error-message {
-  font-size: 12px;
-  color: #ef4444;
-  margin: 0;
-}
-
-.basic-input-helper-text {
-  font-size: 12px;
-  color: #6b7280;
-  margin: 0;
+  border-color: #e5e7eb;
 }

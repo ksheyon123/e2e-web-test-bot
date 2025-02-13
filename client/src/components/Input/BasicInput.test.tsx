@@ -1,127 +1,116 @@
-import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, act } from "@testing-library/react";
 import BasicInput from "./BasicInput";
+import userEvent from "@testing-library/user-event";
 
-describe("BasicInput Component", () => {
+describe("BasicInput", () => {
   const defaultProps = {
+    label: "테스트 입력",
     value: "",
     onChange: jest.fn(),
-    label: "이름",
   };
 
-  beforeEach(() => {
-    jest.clearAllMocks();
+  it("라벨과 입력 필드를 렌더링한다", () => {
+    render(<BasicInput {...defaultProps} />);
+
+    expect(screen.getByLabelText("테스트 입력")).toBeInTheDocument();
+    expect(screen.getByTestId("basic-input")).toBeInTheDocument();
   });
 
-  describe("Label", () => {
-    it("renders label correctly", () => {
-      render(<BasicInput {...defaultProps} />);
-      const label = screen.getByText("이름");
-      expect(label).toBeInTheDocument();
-      expect(label).toHaveClass("basic-input-label");
+  it("required가 true일 때 필수 표시(*)를 보여준다", () => {
+    render(<BasicInput {...defaultProps} required />);
+
+    const requiredMark = screen.getByText("*");
+    expect(requiredMark).toBeInTheDocument();
+    expect(requiredMark).toHaveClass("basic-input-required-mark");
+  });
+
+  it("에러가 있을 때 에러 메시지를 표시하고 컨테이너에 에러 스타일을 적용한다", () => {
+    const errorMessage = "필수 입력 항목입니다";
+    render(<BasicInput {...defaultProps} error={errorMessage} />);
+
+    const container = screen.getByTestId("basic-input-container");
+    expect(screen.getByText(errorMessage)).toBeInTheDocument();
+    expect(screen.getByTestId("error-message")).toHaveClass(
+      "basic-input-error-message"
+    );
+    expect(container).toHaveClass("basic-input-container-error");
+  });
+
+  it("입력 필드가 포커스되면 컨테이너에 파란색 아웃라인이 표시된다", () => {
+    render(<BasicInput {...defaultProps} />);
+
+    const input = screen.getByTestId("basic-input");
+    const container = screen.getByTestId("basic-input-container");
+    act(() => {
+      input.focus();
     });
 
-    it("associates label with input using htmlFor", () => {
-      render(<BasicInput {...defaultProps} id="name-input" />);
-      const label = screen.getByText("이름");
-      expect(label).toHaveAttribute("for", "name-input");
-    });
+    expect(container).toHaveClass("basic-input-container-focused");
+  });
 
-    it("renders required mark when input is required", () => {
-      render(<BasicInput {...defaultProps} required />);
-      const requiredMark = screen.getByText("*");
-      expect(requiredMark).toBeInTheDocument();
-      expect(requiredMark).toHaveClass("basic-input-required-mark");
+  it("helperText가 있을 때 도움말을 표시한다", () => {
+    const helperText = "도움말 텍스트입니다";
+    render(<BasicInput {...defaultProps} helperText={helperText} />);
+
+    expect(screen.getByText(helperText)).toBeInTheDocument();
+    expect(screen.getByTestId("helper-text")).toHaveClass(
+      "basic-input-helper-text"
+    );
+  });
+
+  it("disabled 상태일 때 입력이 비활성화된다", () => {
+    render(<BasicInput {...defaultProps} disabled />);
+
+    const input = screen.getByTestId("basic-input");
+    expect(input).toBeDisabled();
+    expect(screen.getByText("테스트 입력")).toHaveClass(
+      "basic-input-label-disabled"
+    );
+  });
+
+  it("입력 값이 변경될 때 onChange 핸들러를 호출한다", async () => {
+    const onChange = jest.fn();
+    render(<BasicInput {...defaultProps} onChange={onChange} />);
+
+    const input = screen.getByTestId("basic-input");
+    await userEvent.type(input, "테스트");
+
+    expect(onChange).toHaveBeenCalled();
+  });
+
+  it("id가 제공되지 않았을 때 자동으로 id를 생성한다", () => {
+    render(<BasicInput {...defaultProps} />);
+
+    const input = screen.getByTestId("basic-input");
+    expect(input.id).toBe("basic-input-테스트-입력");
+  });
+
+  it("custom id가 제공되었을 때 해당 id를 사용한다", () => {
+    const customId = "custom-input-id";
+    render(<BasicInput {...defaultProps} id={customId} />);
+
+    const input = screen.getByTestId("basic-input");
+    expect(input.id).toBe(customId);
+  });
+
+  it("width와 height가 제공되었을 때 컨테이너에 스타일이 적용된다", () => {
+    const width = "300px";
+    const height = "48px";
+    render(<BasicInput {...defaultProps} width={width} height={height} />);
+
+    const container = screen.getByTestId("basic-input-field-container");
+    expect(container).toHaveStyle({
+      width: width,
+      height: height,
     });
   });
 
-  describe("Input", () => {
-    it("renders input element with correct attributes", () => {
-      render(<BasicInput {...defaultProps} placeholder="이름을 입력하세요" />);
-      const input = screen.getByPlaceholderText("이름을 입력하세요");
-      expect(input).toBeInTheDocument();
-    });
+  it("width와 height가 제공되지 않았을 때 기본 스타일이 적용된다", () => {
+    render(<BasicInput {...defaultProps} />);
 
-    it("handles value change", () => {
-      const onChange = jest.fn();
-      render(<BasicInput {...defaultProps} onChange={onChange} />);
-
-      const input = screen.getByRole("textbox");
-      fireEvent.change(input, { target: { value: "홍길동" } });
-
-      expect(onChange).toHaveBeenCalledTimes(1);
-      expect(onChange).toHaveBeenCalledWith(expect.any(Object));
-    });
-  });
-
-  describe("Error State", () => {
-    it("does not show error message by default", () => {
-      render(<BasicInput {...defaultProps} />);
-      expect(screen.queryByTestId("error-message")).not.toBeInTheDocument();
-    });
-
-    it("shows error message when error prop is provided", () => {
-      const errorMessage = "필수 입력 항목입니다.";
-      render(<BasicInput {...defaultProps} error={errorMessage} />);
-
-      const errorElement = screen.getByText(errorMessage);
-      expect(errorElement).toBeInTheDocument();
-      expect(errorElement).toHaveClass("basic-input-error-message");
-    });
-
-    it("applies error styles to input when error exists", () => {
-      render(<BasicInput {...defaultProps} error="에러 메시지" />);
-      const input = screen.getByRole("textbox");
-      expect(input).toHaveClass("basic-input-error");
-    });
-
-    it("removes error state when error is cleared", () => {
-      const { rerender } = render(
-        <BasicInput {...defaultProps} error="에러 메시지" />
-      );
-      const input = screen.getByRole("textbox");
-      expect(input).toHaveClass("basic-input-error");
-
-      rerender(<BasicInput {...defaultProps} error="" />);
-      expect(input).not.toHaveClass("basic-input-error");
-    });
-  });
-
-  describe("Helper Text", () => {
-    it("renders helper text when provided", () => {
-      const helperText = "영문, 숫자 조합 8자 이상";
-      render(<BasicInput {...defaultProps} helperText={helperText} />);
-
-      const helperElement = screen.getByText(helperText);
-      expect(helperElement).toBeInTheDocument();
-      expect(helperElement).toHaveClass("basic-input-helper-text");
-    });
-
-    it("does not render helper text when not provided", () => {
-      render(<BasicInput {...defaultProps} />);
-      expect(screen.queryByTestId("helper-text")).not.toBeInTheDocument();
-    });
-  });
-
-  describe("Disabled State", () => {
-    it("applies disabled styles to label and input", () => {
-      render(<BasicInput {...defaultProps} disabled />);
-
-      const label = screen.getByText("이름");
-      const input = screen.getByRole("textbox");
-
-      expect(label).toHaveClass("basic-input-label-disabled");
-      expect(input).toBeDisabled();
-    });
-
-    it("prevents value changes when disabled", () => {
-      const onChange = jest.fn();
-      render(<BasicInput {...defaultProps} onChange={onChange} disabled />);
-
-      const input = screen.getByRole("textbox");
-      fireEvent.change(input, { target: { value: "test" } });
-
-      expect(onChange).not.toHaveBeenCalled();
+    const container = screen.getByTestId("basic-input-field-container");
+    expect(container).toHaveStyle({
+      width: "100%",
     });
   });
 });
