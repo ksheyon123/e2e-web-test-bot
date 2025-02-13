@@ -1,42 +1,51 @@
-import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 import List from "./List";
 
 describe("List Component", () => {
-  const mockItems = [
-    { id: 1, text: "Item 1" },
-    { id: 2, text: "Item 2" },
-    { id: 3, text: "Item 3" },
-  ];
+  const mockItems = ["Item 1", "Item 2", "Item 3"];
+  const mockOnClick = jest.fn();
 
-  it("renders list items correctly", () => {
-    render(<List items={mockItems} />);
-
-    const listContainer = screen.getByTestId("list-container");
-    expect(listContainer).toBeInTheDocument();
+  it("목록 아이템들이 올바르게 렌더링되는지 확인", () => {
+    render(<List items={mockItems} onClick={mockOnClick} />);
 
     mockItems.forEach((item) => {
-      const listItem = screen.getByTestId(`list-item-${item.id}`);
-      expect(listItem).toBeInTheDocument();
-      expect(listItem).toHaveTextContent(item.text);
+      expect(screen.getByText(item)).toBeInTheDocument();
     });
   });
 
-  it("calls onItemClick when an item is clicked", () => {
-    const mockOnClick = jest.fn();
-    render(<List items={mockItems} onItemClick={mockOnClick} />);
+  it("아이템 클릭 시 올바른 인덱스와 함께 onClick이 호출되는지 확인", () => {
+    render(<List items={mockItems} onClick={mockOnClick} />);
 
-    const firstItem = screen.getByTestId("list-item-1");
-    fireEvent.click(firstItem);
+    const items = screen.getAllByRole("listitem");
+    fireEvent.click(items[1]); // Click second item
 
     expect(mockOnClick).toHaveBeenCalledWith(1);
   });
 
-  it("renders empty list when no items provided", () => {
-    render(<List items={[]} />);
+  it("각 아이템에 대해 커스텀 자식 컴포넌트가 올바르게 렌더링되는지 확인", () => {
+    const CustomComponent = ({ item }: { item: string }) => (
+      <div data-testid="custom-component">{item}</div>
+    );
 
-    const listContainer = screen.getByTestId("list-container");
-    expect(listContainer).toBeInTheDocument();
-    expect(listContainer.children.length).toBe(0);
+    render(
+      <List items={mockItems} onClick={mockOnClick}>
+        {(item: string) => <CustomComponent item={item} />}
+      </List>
+    );
+
+    const customComponents = screen.getAllByTestId("custom-component");
+    expect(customComponents).toHaveLength(mockItems.length);
+
+    mockItems.forEach((item, index) => {
+      expect(customComponents[index]).toHaveTextContent(item);
+    });
+  });
+
+  it("빈 목록이 제공될 때 올바르게 렌더링되는지 확인", () => {
+    render(<List items={[]} onClick={mockOnClick} />);
+
+    const list = screen.getByRole("list");
+    expect(list.children).toHaveLength(0);
   });
 });
