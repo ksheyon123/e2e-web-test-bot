@@ -17,6 +17,10 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.(png|svg|jpg|jpeg|gif|ico)$/,
+        type: "asset/resource",
+      },
+      {
         test: /\.(ts|tsx)$/,
         exclude: /node_modules/,
         use: "ts-loader",
@@ -29,7 +33,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: "./src/index.html",
+      template: "./public/index.html",
     }),
   ],
   devServer: {
