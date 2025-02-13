@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { createScreenShotsDir } from "./utils/fs";
 import router from "./router/endpoint";
 import api from "./router/api";
+import reactRouter from "./router/react";
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.use(express.static("public"));
 
 app.use("/automate", router);
 app.use("/api", api);
+app.use("/", reactRouter);
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   res.set("Cache-Control", "no-store");
