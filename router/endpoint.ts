@@ -57,12 +57,10 @@ router.get("/launch", async (req: Request, res: Response) => {
       },
     });
     page = await browser.newPage();
-    page.setDefaultNavigationTimeout(30000);
-    page.setDefaultTimeout(30000);
-    if (page && typeof url === "string") {
-      await goToPage(page, url);
-      await createGridOverlay(page);
-    }
+    page.setDefaultNavigationTimeout(3000);
+    page.setDefaultTimeout(3000);
+    await goToPage(page);
+    await createGridOverlay(page);
     res.json({ success: true });
   } catch (e) {
     console.error("자동화 에러:", e);

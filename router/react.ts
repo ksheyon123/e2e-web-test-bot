@@ -7,7 +7,7 @@ const router = express.Router();
 router.use(express.static(path.resolve(__dirname, "../client/build")));
 
 // 모든 요청에 대해 index.html 반환
-router.get("*", (req, res) => {
+router.get("/client", (req, res) => {
   console.log("Request path:", req.path);
   res.sendFile(path.resolve(__dirname, "../client/build/index.html"));
 });

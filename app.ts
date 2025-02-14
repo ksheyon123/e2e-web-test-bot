@@ -1,6 +1,7 @@
 import express, { Express, Request, Response, NextFunction } from "express";
 import morgan from "morgan";
 import dotenv from "dotenv";
+import cors from "cors";
 import { createScreenShotsDir } from "./utils/fs";
 import router from "./router/endpoint";
 import api from "./router/api";
@@ -12,6 +13,17 @@ const app: Express = express();
 const port: number = 8080;
 
 createScreenShotsDir();
+
+// 모든 도메인에서의 요청 허용
+app.use(cors());
+
+// 또는 특정 도메인만 허용
+app.use(
+  cors({
+    origin: "http://localhost:8888", // React 앱의 주소
+    credentials: true, // 쿠키/인증 헤더 허용 (필요한 경우)
+  })
+);
 
 // 미들웨어 설정
 app.use(express.json());

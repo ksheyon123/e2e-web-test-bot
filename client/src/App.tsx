@@ -8,22 +8,27 @@ type Item = {
 };
 
 const App: React.FC = () => {
-  const child = ({ items }: Item) => (
-    <Dropdown options={items} onSelect={() => {}} placeholder="HI" />
-  );
+  const [data, setData] = useState<any[]>([]);
+  const onLauch = async () => {
+    await fetch("http://127.0.0.1:8080/automate/launch");
+    await fetch("http://127.0.0.1:8080/automate/screenshot");
+    const r = await fetch("http://127.0.0.1:8080/automate/features");
+    if (r.status === 200) {
+      const { data } = await r.json();
+      const { elements } = data;
+      setData(elements);
+    }
+  };
   return (
     <div>
-      <h1>React TypeScript App</h1>
-      <p>Welcome to the React TypeScript application!</p>
-      <List
-        items={
-          [
-            { name: "HI", items: [{ name: "Item1" }, { name: "Item2" }] },
-            { name: "BYR", items: [{ name: "Item3" }] },
-          ] as Item[]
-        }
-        children={(d) => child(d)}
-      />
+      <div
+        onClick={() => {
+          onLauch();
+        }}
+      >
+        Click
+      </div>
+      <List items={data} />
     </div>
   );
 };
