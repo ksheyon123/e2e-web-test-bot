@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import List from "./components/List/List";
 import { AISearchElement, AISearchSpec, Response } from "./types";
+import Layout from "./components/Layout/Layout";
 
 const App: React.FC = () => {
   const [data, setData] = useState<AISearchElement[]>([]);
@@ -25,7 +26,7 @@ const App: React.FC = () => {
     }
   };
   return (
-    <div>
+    <Layout>
       <div
         onClick={() => {
           onLauch();
@@ -39,7 +40,7 @@ const App: React.FC = () => {
           `${item.text} ${item.type.toUpperCase()}`
         }
       />
-    </div>
+    </Layout>
   );
 };
 

@@ -1,36 +1,26 @@
-import React, { useEffect, useCallback, ReactNode, useState } from "react";
+import React, { useEffect, useCallback, ReactNode } from "react";
 import "./Drawer.css";
 
 interface DrawerProps {
-  title: string;
+  isOpen: boolean;
+  onClose: () => void;
   children?: ReactNode;
   component?: ReactNode;
-  onToggle?: (isOpen: boolean) => void;
 }
 
 const Drawer: React.FC<DrawerProps> = ({
-  title,
+  isOpen,
+  onClose,
   children,
   component,
-  onToggle,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const handleToggle = useCallback(() => {
-    const newState = !isOpen;
-    setIsOpen(newState);
-    if (onToggle) {
-      onToggle(newState);
-    }
-  }, [isOpen, onToggle]);
-
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
       if (event.key === "Escape" && isOpen) {
-        handleToggle();
+        onClose();
       }
     },
-    [isOpen, handleToggle]
+    [isOpen, onClose]
   );
 
   useEffect(() => {
@@ -40,44 +30,15 @@ const Drawer: React.FC<DrawerProps> = ({
     };
   }, [handleKeyDown]);
 
-  const renderIcon = () => {
-    if (isOpen) {
-      return (
-        <button
-          data-testid="close-icon"
-          className="drawer-icon"
-          onClick={handleToggle}
-          aria-label="닫기"
-        >
-          ✕
-        </button>
-      );
-    }
-    return (
-      <button
-        data-testid="open-icon"
-        className="drawer-icon"
-        onClick={handleToggle}
-        aria-label="열기"
-      >
-        ≡
-      </button>
-    );
-  };
-
   return (
     <div className="drawer-container">
       {isOpen && (
         <div
           data-testid="drawer-backdrop"
           className="drawer-backdrop"
-          onClick={handleToggle}
+          onClick={onClose}
         />
       )}
-      <div className="drawer-header">
-        <h2 className="drawer-title">{title}</h2>
-        {renderIcon()}
-      </div>
       <div
         role="dialog"
         aria-modal="true"

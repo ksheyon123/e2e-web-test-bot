@@ -1,85 +1,68 @@
 .drawer-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  z-index: 1000;
-}
-
-.drawer-backdrop {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-.drawer {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 300px;
-  background-color: white;
-  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
-  transform: translateX(100%);
-  transition: transform 0.3s ease-in-out;
-  display: flex;
-  flex-direction: column;
-}
-
-.drawer.drawer-open {
-  transform: translateX(0);
+  position: relative;
 }
 
 .drawer-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   padding: 16px;
-  border-bottom: 1px solid #eee;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .drawer-title {
   margin: 0;
   font-size: 1.2rem;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .drawer-icon {
   background: none;
   border: none;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   cursor: pointer;
   padding: 4px 8px;
-  color: #666;
-  transition: color 0.2s;
+  color: #333;
+  transition: color 0.2s ease;
 }
 
 .drawer-icon:hover {
   color: #000;
 }
 
-.drawer-component {
-  padding: 16px;
-  border-bottom: 1px solid #eee;
+.drawer-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
 }
 
-.drawer-content {
-  padding: 16px;
-  flex: 1;
+.drawer {
+  position: fixed;
+  top: 0;
+  left: -300px;
+  width: 300px;
+  height: 100vh;
+  background-color: white;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+  z-index: 1001;
   overflow-y: auto;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+.drawer-open {
+  transform: translateX(300px);
+}
+
+.drawer-component,
+.drawer-content {
+  padding: 16px;
+}
+
+.drawer-component + .drawer-content {
+  border-top: 1px solid #e0e0e0;
 }

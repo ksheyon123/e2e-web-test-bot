@@ -1,98 +1,72 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import "@testing-library/jest-dom";
 import Drawer from "./Drawer";
 
-describe("Drawer 컴포넌트", () => {
-  const mockOnToggle = jest.fn();
-  const drawerContent = "Drawer 내용";
-  const title = "Drawer 제목";
-  const CustomComponent = () => (
-    <div data-testid="custom-component">커스텀 컴포넌트</div>
-  );
+describe("Drawer", () => {
+  const mockClose = jest.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    mockClose.mockClear();
   });
 
-  it("초기 상태에서는 닫혀있어야 함", () => {
-    render(
-      <Drawer title={title} onToggle={mockOnToggle}>
-        {drawerContent}
-      </Drawer>
-    );
-
-    expect(screen.getByTestId("open-icon")).toBeInTheDocument();
-    expect(screen.queryByTestId("drawer-backdrop")).not.toBeInTheDocument();
+  it("renders drawer when isOpen is true", () => {
+    render(<Drawer isOpen={true} onClose={mockClose} />);
+    expect(screen.getByRole("dialog")).toHaveClass("drawer-open");
   });
 
-  it("아이콘 클릭 시 Drawer가 열리고 닫혀야 함", () => {
-    render(
-      <Drawer title={title} onToggle={mockOnToggle}>
-        {drawerContent}
-      </Drawer>
-    );
-
-    // 열기
-    const openIcon = screen.getByTestId("open-icon");
-    fireEvent.click(openIcon);
-    expect(screen.getByTestId("close-icon")).toBeInTheDocument();
-    expect(screen.getByTestId("drawer-backdrop")).toBeInTheDocument();
-    expect(mockOnToggle).toHaveBeenCalledWith(true);
-
-    // 닫기
-    const closeIcon = screen.getByTestId("close-icon");
-    fireEvent.click(closeIcon);
-    expect(screen.getByTestId("open-icon")).toBeInTheDocument();
-    expect(screen.queryByTestId("drawer-backdrop")).not.toBeInTheDocument();
-    expect(mockOnToggle).toHaveBeenCalledWith(false);
+  it("does not render drawer when isOpen is false", () => {
+    render(<Drawer isOpen={false} onClose={mockClose} />);
+    expect(screen.getByRole("dialog")).not.toHaveClass("drawer-open");
   });
 
-  it("커스텀 컴포넌트가 올바르게 렌더링되는지 확인", () => {
-    render(
-      <Drawer title={title} component={<CustomComponent />}>
-        {drawerContent}
-      </Drawer>
-    );
-
-    const openIcon = screen.getByTestId("open-icon");
-    fireEvent.click(openIcon);
-
-    expect(screen.getByTestId("custom-component")).toBeInTheDocument();
-  });
-
-  it("백드롭 클릭 시 Drawer가 닫혀야 함", () => {
-    render(
-      <Drawer title={title} onToggle={mockOnToggle}>
-        {drawerContent}
-      </Drawer>
-    );
-
-    // 먼저 Drawer 열기
-    const openIcon = screen.getByTestId("open-icon");
-    fireEvent.click(openIcon);
-
+  it("closes drawer when backdrop is clicked", () => {
+    render(<Drawer isOpen={true} onClose={mockClose} />);
     const backdrop = screen.getByTestId("drawer-backdrop");
     fireEvent.click(backdrop);
-
-    expect(screen.getByTestId("open-icon")).toBeInTheDocument();
-    expect(mockOnToggle).toHaveBeenCalledWith(false);
+    expect(mockClose).toHaveBeenCalled();
   });
 
-  it("ESC 키 입력 시 Drawer가 닫혀야 함", () => {
+  it("closes drawer when ESC key is pressed", () => {
+    render(<Drawer isOpen={true} onClose={mockClose} />);
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(mockClose).toHaveBeenCalled();
+  });
+
+  it("renders children content", () => {
     render(
-      <Drawer title={title} onToggle={mockOnToggle}>
-        {drawerContent}
+      <Drawer isOpen={true} onClose={mockClose}>
+        <div data-testid="child-content">Child Content</div>
+      </Drawer>
+    );
+    expect(screen.getByTestId("child-content")).toBeInTheDocument();
+    expect(screen.getByText("Child Content")).toBeInTheDocument();
+  });
+
+  it("renders component prop", () => {
+    const TestComponent = () => (
+      <div data-testid="test-component">Test Component</div>
+    );
+
+    render(
+      <Drawer isOpen={true} onClose={mockClose} component={<TestComponent />} />
+    );
+
+    expect(screen.getByTestId("test-component")).toBeInTheDocument();
+    expect(screen.getByText("Test Component")).toBeInTheDocument();
+  });
+
+  it("renders both children and component prop", () => {
+    const TestComponent = () => (
+      <div data-testid="test-component">Test Component</div>
+    );
+
+    render(
+      <Drawer isOpen={true} onClose={mockClose} component={<TestComponent />}>
+        <div data-testid="child-content">Child Content</div>
       </Drawer>
     );
 
-    // 먼저 Drawer 열기
-    const openIcon = screen.getByTestId("open-icon");
-    fireEvent.click(openIcon);
-
-    fireEvent.keyDown(document, { key: "Escape" });
-
-    expect(screen.getByTestId("open-icon")).toBeInTheDocument();
-    expect(mockOnToggle).toHaveBeenCalledWith(false);
+    expect(screen.getByTestId("test-component")).toBeInTheDocument();
+    expect(screen.getByTestId("child-content")).toBeInTheDocument();
   });
 });
