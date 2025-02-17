@@ -10,14 +10,18 @@ import {
 } from "../utils/puppeteer";
 import { createHash } from "../utils/index";
 import { setScreenshots, getScreenshots } from "../utils/fs";
+import { model } from "../app";
+import { createChain, createPrompt, requestAnswer } from "../utils/langchain";
 import {
-  createModel,
-  createPrompt,
-  createChain,
-  requestAnswer,
-} from "../utils/langchain";
-import { humanPrompt_new, humanPrompt_coord } from "../prompt/prompt";
+  humanPrompt_new,
+  humanPrompt_coord,
+  systemPrompt_new,
+  formatInstruction,
+  systemPrompt_coord,
+  formatInstruction_coord,
+} from "../prompt/prompt";
 import { AnswerElement } from "types/langchain.type";
+import { ChatAnthropic } from "@langchain/anthropic";
 
 interface Coordinate {
   x: number;
@@ -98,8 +102,9 @@ router.get("/features", async (_req: Request, res: Response) => {
     // 2. buffer를 base64로 변환
     const base64Image = imageBuffer.toString("base64");
     const query = `${humanPrompt_new}`;
-    const model = createModel();
-    const prompt = await createPrompt();
+    const systemPrompt = systemPrompt_new;
+    const instruction = formatInstruction;
+    const prompt = await createPrompt(systemPrompt, instruction);
     const chain = await createChain(prompt, model);
     const response = await requestAnswer<any>(chain, query, base64Image);
     actions = { ...response };
@@ -118,14 +123,20 @@ router.get("/coord", async (req: Request, res: Response) => {
     // 2. buffer를 base64로 변환
     const base64Image = imageBuffer.toString("base64");
     const query = `${humanPrompt_coord}`;
-    const model = createModel();
-    const prompt = await createPrompt();
+    const systemPrompt = systemPrompt_coord;
+    const instruction = formatInstruction_coord;
+    const prompt = await createPrompt(systemPrompt, instruction);
     const chain = await createChain(prompt, model);
     const response = await requestAnswer<any>(chain, query, base64Image);
     actions = { ...response };
+    const { pixelCoord } = response.elements[0];
+    if (page) {
+      await mouseMove(page, pixelCoord, { width: 10, height: 20 });
+      getScreenshot(page, hash, "1.png");
+    }
     res.json({ success: true, data: response });
   } catch (e) {
-    throw e;
+    res.status(500).json({ success: false, error: (e as Error).message });
   }
 });
 

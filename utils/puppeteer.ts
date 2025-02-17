@@ -81,11 +81,15 @@ async function runAutomation(browser: Browser): Promise<PageEvaluateResult> {
   }
 }
 
-const getScreenshot = async (page: Page, hash: string): Promise<void> => {
+const getScreenshot = async (
+  page: Page,
+  hash: string,
+  name = "default_screen.png"
+): Promise<void> => {
   try {
     // 로그인 시도 전 스크린샷
     await page.screenshot({
-      path: `./public/screenshots/${hash}/default_screen.png`,
+      path: `./public/screenshots/${hash}/${name}`,
     });
   } catch (e) {
     throw e;

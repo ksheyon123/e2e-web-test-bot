@@ -5,6 +5,7 @@ import Layout from "./components/Layout/Layout";
 import Paginator from "./components/Paginator/Paginator";
 import { ImageView } from "./components/ImageView/ImageView";
 import Loading from "./components/Loading/Loading";
+import { findComponents } from "./utils";
 
 const App: React.FC = () => {
   const [data, setData] = useState<AISearchElement[]>([]);
@@ -30,11 +31,13 @@ const App: React.FC = () => {
       setScreenId(screenshot_id);
       setScreenBase64(base64);
     }
-    const r1 = await fetch("http://localhost:8080/automate/features");
+    const r1 = await fetch("http://localhost:8080/automate/coord");
     if (r1.status === 200) {
       const { data } = (await r1.json()) as Response<AISearchSpec>;
-      const { elements } = data;
-      setData(elements);
+      console.log(data);
+
+      // const { elements } = data;
+      // setData(elements);
     }
     setIsLoading(false);
   };

@@ -3,6 +3,8 @@ import morgan from "morgan";
 import dotenv from "dotenv";
 import cors from "cors";
 import { createScreenShotsDir } from "./utils/fs";
+import { createModel, createPrompt, createChain } from "./utils/langchain";
+import { ChatAnthropic } from "@langchain/anthropic";
 import router from "./router/endpoint";
 import api from "./router/api";
 import reactRouter from "./router/react";
@@ -13,6 +15,21 @@ const app: Express = express();
 const port: number = 8080;
 
 createScreenShotsDir();
+
+// Initialize LangChain model and chain
+export let model: ChatAnthropic;
+
+const initializeLangChain = async () => {
+  try {
+    model = createModel();
+    console.log("LangChain model and chain initialized successfully");
+  } catch (error) {
+    console.error("Failed to initialize LangChain:", error);
+    process.exit(1);
+  }
+};
+
+initializeLangChain();
 
 // CORS configuration
 app.use(

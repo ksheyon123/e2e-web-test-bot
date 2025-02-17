@@ -2,11 +2,6 @@ import { ChatAnthropic } from "@langchain/anthropic";
 import { JsonOutputParser } from "@langchain/core/output_parsers";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import {
-  systemPrompt_new,
-  humanPrompt_new,
-  formatInstruction,
-} from "../prompt/prompt";
-import {
   Runnable,
   RunnableLambda,
   RunnableSequence,
@@ -23,12 +18,15 @@ const createModel = (): ChatAnthropic => {
   });
 };
 
-const createPrompt = async (): Promise<ChatPromptTemplate> => {
+const createPrompt = async (
+  systemPrompt: string,
+  instruction: string
+): Promise<ChatPromptTemplate> => {
   console.log("Claude 요청 메세지 생성...");
 
   // https://js.langchain.com/docs/how_to/multimodal_prompts/
   const chatPrompt = ChatPromptTemplate.fromMessages([
-    ["system", `${systemPrompt_new}\n\n응답 형식:\n{format_instructions}`],
+    ["system", `${systemPrompt}\n\n응답 형식:\n{format_instructions}`],
     [
       "user",
       [
@@ -37,7 +35,7 @@ const createPrompt = async (): Promise<ChatPromptTemplate> => {
       ],
     ],
   ]).partial({
-    format_instructions: formatInstruction,
+    format_instructions: instruction,
   });
 
   return chatPrompt;
