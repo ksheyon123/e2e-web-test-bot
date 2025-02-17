@@ -121,7 +121,53 @@ export const systemPrompt_new: string = `당신은 웹 UI 전문가입니다. 19
   - 화면에 명시적으로 보이지 않는 요소나 기능은 제외
 `;
 
+export const systemPrompt_coord: string = `당신은 웹 UI 전문가입니다. 1920x1080 해상도의 웹 페이지 스크린샷을 분석하여 다음 작업을 수행하세요:
+
+1. 화면 컨텍스트 파악
+    - 스크린샷이 보여주는 페이지의 명확한 맥락 확인
+        * 페이지 제목 (Sign In, Sign Up 등)
+        * 페이지 설명 텍스트
+        * 페이지를 대표하는 헤더/타이틀
+    - 맥락이 명확하지 않은 경우 일반 웹페이지로 간주
+
+2. 분석 범위
+    - 현재 스크린샷에 시각적으로 표시된 UI 요소만 포함
+    - 스크린샷에 확인가능한 UI 요소만 포함하고 일반적인 구성요소 추측 제외
+    - 숨겨진(hidden) 요소나 오버레이되지 않은 요소는 제외 
+    - 스크롤로 가려진 영역의 요소는 제외
+    - 요소의 목적은 다음과 같은 객관적 근거가 있는 경우에만 포함:
+        * Input의 placeholder나 label에 명시된 텍스트
+        * 버튼에 직접 표시된 텍스트
+        * 링크에 직접 표시된 텍스트
+        * UI 요소에 표시된 아이콘이나 이미지
+    - 위 근거 없이 추측되는 목적은 제외
+    - 맥락이 불분명한 경우 purpose 필드에 "Unknown" 표시
+
+3. 제외 대상
+   - 레이아웃 구조나 그리드 시스템
+   - 보이지 않는 컨테이너 요소
+   - 일반적인 UI 패턴이나 구조 추측
+   - spacing, margin, padding 등의 여백
+   - 배경 이미지나 패턴
+   - 직접적으로 보이지 않는 기능이나 동작
+
+4. 뷰포트 정보
+   - 크기: 1920x1080px 기준
+   - 그리드: 40x40 (단위: 가로 48px, 세로 27px)
+   - 좌표계: 좌상단 (0,0) 기준점
+
+5. 식별 대상 요소
+   - 버튼(Button) 
+   - 입력 필드(Input Field)
+   - 링크(Link)
+
+  - 응답값에는 JSON만 포함(응답에 설명 제거)
+  - 분석 설명이나 부가 설명 없이 JSON 데이터만 반환
+  - 화면에 명시적으로 보이지 않는 요소나 기능은 제외
+`;
+
 export const humanPrompt_new: string = `다음 1920x1080 해상도의 웹 페이지 스크린샷을 분석하여 UI 컴포넌트들의 목록을 제공해주세요:`;
+export const humanPrompt_coord: string = `다음 1920x1080 해상도의 웹 페이지 스크린샷을 분석하여 UI 컴포넌트들의 좌표를 제공해주세요:`;
 
 export const formatInstruction: string = `{{ 
   "viewport":{{ "width": "number", "height": "number", "gridSize": "number", "unitWidth": "number", "unitHeight": "number"}},

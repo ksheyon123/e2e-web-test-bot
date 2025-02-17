@@ -34,7 +34,7 @@ const goToPage = async (
   url: string = "http://localhost:3000/signin"
 ): Promise<void> => {
   console.log("로그인 페이지로 이동 시도...");
-  await page.goto("http://localhost:3000/signin", {
+  await page.goto(url, {
     waitUntil: "networkidle0",
     timeout: 30000,
   });

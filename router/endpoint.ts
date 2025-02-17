@@ -16,7 +16,7 @@ import {
   createChain,
   requestAnswer,
 } from "../utils/langchain";
-import { humanPrompt_new } from "../prompt/prompt";
+import { humanPrompt_new, humanPrompt_coord } from "../prompt/prompt";
 import { AnswerElement } from "types/langchain.type";
 
 interface Coordinate {
@@ -50,7 +50,6 @@ router.get("/launch", async (req: Request, res: Response) => {
   try {
     const { url } = req.query;
     const browser: Browser = await puppeteer.launch({
-      headless: false,
       defaultViewport: {
         width: 1920,
         height: 1080,
@@ -75,7 +74,13 @@ router.get("/screenshot", async (_req: Request, res: Response) => {
       await setScreenshots(hash);
       console.log("초기 화면 스크린샷...");
       await getScreenshot(page, hash);
-      res.json({ success: true });
+      const imageBuffer = await getScreenshots(hash, "default_screen.png");
+      // 2. buffer를 base64로 변환
+      const base64Image = imageBuffer.toString("base64");
+      res.json({
+        success: true,
+        data: { screenshot_id: hash, base64: base64Image },
+      });
     } else {
       throw new Error("Page or hash not initialized");
     }
@@ -101,6 +106,26 @@ router.get("/features", async (_req: Request, res: Response) => {
     res.json({ success: true, data: response });
   } catch (e) {
     res.status(500).json({ success: false, error: (e as Error).message });
+  }
+});
+
+router.get("/coord", async (req: Request, res: Response) => {
+  try {
+    if (!hash) {
+      throw new Error("Hash not initialized");
+    }
+    const imageBuffer = await getScreenshots(hash, "default_screen.png");
+    // 2. buffer를 base64로 변환
+    const base64Image = imageBuffer.toString("base64");
+    const query = `${humanPrompt_coord}`;
+    const model = createModel();
+    const prompt = await createPrompt();
+    const chain = await createChain(prompt, model);
+    const response = await requestAnswer<any>(chain, query, base64Image);
+    actions = { ...response };
+    res.json({ success: true, data: response });
+  } catch (e) {
+    throw e;
   }
 });
 
