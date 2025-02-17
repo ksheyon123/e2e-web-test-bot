@@ -48,4 +48,31 @@ describe("List Component", () => {
     const list = screen.getByRole("list");
     expect(list.children).toHaveLength(0);
   });
+
+  it("titleFormatter가 제공될 때 올바르게 포맷팅되는지 확인", () => {
+    const mockItems = [1, 2, 3];
+    const titleFormatter = (item: number) => `Item ${item}`;
+
+    render(
+      <List
+        items={mockItems}
+        onClick={mockOnClick}
+        titleFormatter={titleFormatter}
+      />
+    );
+
+    mockItems.forEach((item) => {
+      expect(screen.getByText(`Item ${item}`)).toBeInTheDocument();
+    });
+  });
+
+  it("titleFormatter가 없을 때 item이 그대로 출력되는지 확인", () => {
+    const mockItems = [1, 2, 3];
+
+    render(<List items={mockItems} onClick={mockOnClick} />);
+
+    mockItems.forEach((item) => {
+      expect(screen.getByText(String(item))).toBeInTheDocument();
+    });
+  });
 });

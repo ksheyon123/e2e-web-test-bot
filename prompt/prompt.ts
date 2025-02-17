@@ -125,5 +125,5 @@ export const humanPrompt_new: string = `다음 1920x1080 해상도의 웹 페이
 
 export const formatInstruction: string = `{{ 
   "viewport":{{ "width": "number", "height": "number", "gridSize": "number", "unitWidth": "number", "unitHeight": "number"}},
-  "elements": [{{ "type": "string", "purpose": "string", "text": "string" }}],
+  "elements": [{{ "type": "string", "purpose": "string", "text": "string", "test_case" : string[] }}],
 }}`;

@@ -1,21 +1,26 @@
 import React, { useState } from "react";
 import List from "./components/List/List";
-import Dropdown from "./components/Dropdown/Dropdown";
-
-type Item = {
-  name: string;
-  items: Item[];
-};
+import { AISearchElement, AISearchSpec, Response } from "./types";
 
 const App: React.FC = () => {
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<AISearchElement[]>([]);
   const onLauch = async () => {
-    await fetch("http://127.0.0.1:8080/automate/launch");
-    await fetch("http://127.0.0.1:8080/automate/screenshot");
-    const r = await fetch("http://127.0.0.1:8080/automate/features");
+    await fetch("http://localhost:8080/automate/launch", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    await fetch("http://localhost:8080/automate/screenshot", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const r = await fetch("http://localhost:8080/automate/features");
     if (r.status === 200) {
-      const { data } = await r.json();
+      const { data } = (await r.json()) as Response<AISearchSpec>;
       const { elements } = data;
+      console.log(elements);
       setData(elements);
     }
   };
@@ -28,7 +33,12 @@ const App: React.FC = () => {
       >
         Click
       </div>
-      <List items={data} />
+      <List
+        items={data}
+        titleFormatter={(item: AISearchElement) =>
+          `${item.text} ${item.type.toUpperCase()}`
+        }
+      />
     </div>
   );
 };

@@ -14,32 +14,34 @@ const port: number = 8080;
 
 createScreenShotsDir();
 
-// 모든 도메인에서의 요청 허용
-app.use(cors());
-
-// 또는 특정 도메인만 허용
+// CORS configuration
 app.use(
   cors({
-    origin: "http://localhost:8888", // React 앱의 주소
-    credentials: true, // 쿠키/인증 헤더 허용 (필요한 경우)
+    origin: "http://localhost:8888",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    optionsSuccessStatus: 200,
   })
 );
 
-// 미들웨어 설정
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
-// 정적 파일 제공
+// Static files
 app.use(express.static("public"));
 
-app.use("/automate", router);
-app.use("/api", api);
-app.use("/", reactRouter);
-
+// Additional CORS headers for all routes
 app.use((req: Request, res: Response, next: NextFunction) => {
-  res.set("Cache-Control", "no-store");
-  // 또는 더 완벽한 캐시 비활성화를 위해:
+  res.header("Access-Control-Allow-Origin", "http://localhost:8888");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  next();
+});
+
+// Cache control
+app.use((req: Request, res: Response, next: NextFunction) => {
   res.set({
     "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
     Pragma: "no-cache",
@@ -49,7 +51,11 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-// 서버 시작
+// Routes
+app.use("/automate", router);
+app.use("/api", api);
+app.use("/", reactRouter);
+
 app.listen(port, () => {
-  console.log(`서버가 http://localhost:${port} 에서 실행 중입니다`);
+  console.log(`Server running at http://localhost:${port}`);
 });
