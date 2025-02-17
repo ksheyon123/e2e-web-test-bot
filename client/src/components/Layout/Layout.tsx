@@ -19,7 +19,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
-      <Header title="E2E TEST" onDrawerOpen={handleDrawerOpen} />
+      <Header title="" onDrawerOpen={handleDrawerOpen} />
       <div style={{ display: "flex", flex: 1, position: "relative" }}>
         <Drawer isOpen={isDrawerOpen} onClose={handleDrawerClose}>
           <nav>
