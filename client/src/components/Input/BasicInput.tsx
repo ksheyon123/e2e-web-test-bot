@@ -9,6 +9,8 @@ export interface BasicInputProps extends Omit<BaseInputProps, "className"> {
   error?: string;
   /** 도움말 텍스트 */
   helperText?: string;
+  /** 도움말 아이콘 */
+  helperIcon?: React.ReactNode;
   /** 입력 필드의 ID */
   id?: string;
   /** 입력 필드의 너비 */
@@ -21,6 +23,7 @@ const BasicInput = ({
   label,
   error,
   helperText,
+  helperIcon,
   id,
   required,
   disabled,
@@ -82,6 +85,7 @@ const BasicInput = ({
       )}
       {helperText && !error && (
         <p className="basic-input-helper-text" data-testid="helper-text">
+          {helperIcon}
           {helperText}
         </p>
       )}

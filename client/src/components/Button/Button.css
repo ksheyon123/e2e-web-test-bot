@@ -1,0 +1,103 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  gap: 8px;
+  padding: 0 16px;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Variants */
+.button-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.button-primary:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.button-secondary {
+  background-color: #f8f9fa;
+  color: #212529;
+  border: 1px solid #dee2e6;
+}
+
+.button-secondary:hover:not(:disabled) {
+  background-color: #e9ecef;
+}
+
+.button-text {
+  background-color: transparent;
+  color: #007bff;
+  padding: 0;
+}
+
+.button-text:hover:not(:disabled) {
+  color: #0056b3;
+  background-color: transparent;
+}
+
+/* Sizes */
+.button-small {
+  height: 32px;
+  font-size: 14px;
+}
+
+.button-medium {
+  height: 40px;
+  font-size: 16px;
+}
+
+.button-large {
+  height: 48px;
+  font-size: 18px;
+}
+
+/* Icon styles */
+.button-with-start-icon {
+  padding-left: 12px;
+}
+
+.button-with-end-icon {
+  padding-right: 12px;
+}
+
+.button-icon-only {
+  padding: 0;
+  width: 40px;
+  height: 40px;
+}
+
+.button-icon-only.button-small {
+  width: 32px;
+  height: 32px;
+}
+
+.button-icon-only.button-large {
+  width: 48px;
+  height: 48px;
+}
+
+/* Loading spinner */
+.button-loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

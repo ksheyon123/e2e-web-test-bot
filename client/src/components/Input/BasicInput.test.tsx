@@ -1,6 +1,7 @@
 import { render, screen, act } from "@testing-library/react";
 import BasicInput from "./BasicInput";
 import userEvent from "@testing-library/user-event";
+import { FiAlertCircle } from "react-icons/fi";
 
 describe("BasicInput", () => {
   const defaultProps = {
@@ -111,6 +112,33 @@ describe("BasicInput", () => {
     const container = screen.getByTestId("basic-input-field-container");
     expect(container).toHaveStyle({
       width: "100%",
+    });
+  });
+
+  describe("helperText with icon", () => {
+    it("helperText에 아이콘과 텍스트가 함께 렌더링된다", () => {
+      const helperText = "도움말 텍스트입니다";
+      render(
+        <BasicInput
+          {...defaultProps}
+          helperText={helperText}
+          helperIcon={<FiAlertCircle data-testid="helper-icon" />}
+        />
+      );
+
+      expect(screen.getByText(helperText)).toBeInTheDocument();
+      expect(screen.getByTestId("helper-icon")).toBeInTheDocument();
+      expect(screen.getByTestId("helper-text")).toHaveClass(
+        "basic-input-helper-text"
+      );
+    });
+
+    it("helperIcon이 제공되지 않았을 때 텍스트만 렌더링된다", () => {
+      const helperText = "도움말 텍스트입니다";
+      render(<BasicInput {...defaultProps} helperText={helperText} />);
+
+      expect(screen.getByText(helperText)).toBeInTheDocument();
+      expect(screen.queryByTestId("helper-icon")).not.toBeInTheDocument();
     });
   });
 });
