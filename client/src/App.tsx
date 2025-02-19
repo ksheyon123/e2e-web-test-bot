@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Root from "./pages/Root";
 import UI from "./pages/UI";
+import Register from "./pages/Register";
 
 const App: React.FC = () => {
   return (
@@ -16,6 +17,7 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/" element={<Root />} />
           <Route path="/ui" element={<UI />} />
+          <Route path="/signup" element={<Register />} />
         </Routes>
       </div>
     </Router>

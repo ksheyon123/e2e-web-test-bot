@@ -16,10 +16,21 @@ export const ImageView: React.FC<ImageViewProps> = ({
     return null;
   }
 
-  // base64Data가 'data:image/' 접두사를 포함하지 않는 경우 추가
-  const imageSource = base64Data.startsWith("data:image/")
-    ? base64Data
-    : `data:image/png;base64,${base64Data}`;
+  // URL이 http/https로 시작하는지 확인
+  const isHttpUrl = /^https?:\/\//i.test(base64Data);
+
+  // base64 데이터인지 확인 (base64 문자열 패턴 체크)
+  const isBase64 = /^[A-Za-z0-9+/=]+$/.test(base64Data);
+
+  let imageSource = base64Data;
+
+  if (!isHttpUrl) {
+    if (base64Data.startsWith("data:image/")) {
+      imageSource = base64Data;
+    } else if (isBase64) {
+      imageSource = `data:image/png;base64,${base64Data}`;
+    }
+  }
 
   return (
     <div className={`image-view ${className}`}>

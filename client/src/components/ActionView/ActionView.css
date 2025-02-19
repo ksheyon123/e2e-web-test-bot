@@ -1,0 +1,41 @@
+.action-view {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.action-view-image {
+  width: 100%;
+}
+
+.action-view-wrapper {
+  width: 400px;
+  height: 200px;
+  border: 1px solid #aaa;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.action-view-code {
+  width: 100%;
+  height: 140px;
+  margin-bottom: 20px;
+  border: 1px solid #aaa;
+  overflow: hidden;
+}
+
+.action-view-code .code-block {
+  height: 100%;
+  margin: 0;
+}
+
+.action-view-code .code-block-content {
+  height: calc(100% - 33px); /* header height */
+}
+
+.action-view-paginator {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+}
